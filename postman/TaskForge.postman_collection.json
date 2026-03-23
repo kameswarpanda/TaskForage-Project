@@ -1,0 +1,314 @@
+{
+  "info": {
+    "name": "TaskForge API",
+    "description": "Enterprise Task & Project Management System API.\nCovers: Auth (JWT + Basic), Users, Roles, Projects, Tasks, Reports.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://localhost:7201/api/v1", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "refreshToken", "value": "", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [ { "key": "token", "value": "{{accessToken}}", "type": "string" } ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@taskforge.dev\",\n  \"password\": \"Test@123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data) {",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin@123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data) {",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/refresh",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.data) {",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Token (Logout)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/revoke",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users?page=1&pageSize=10" }
+        },
+        {
+          "name": "Get User by ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users/1" }
+        },
+        {
+          "name": "Create User (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/users",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"janedoe\",\n  \"email\": \"jane@taskforge.dev\",\n  \"password\": \"Jane@123\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"roleIds\": [2]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/users/2",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jonathan\",\n  \"lastName\": \"Doe\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User (Admin)",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/users/3" }
+        },
+        {
+          "name": "Assign Role (Admin)",
+          "request": { "method": "POST", "url": "{{baseUrl}}/users/2/roles/1" }
+        },
+        {
+          "name": "Remove Role (Admin)",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/users/2/roles/1" }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": { "method": "GET", "url": "{{baseUrl}}/roles" }
+        },
+        {
+          "name": "Get Role by ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/roles/1" }
+        },
+        {
+          "name": "Create Role (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/roles",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Manager\",\n  \"description\": \"Project management access\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Role (Admin)",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/roles/3" }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Get All Projects",
+          "request": { "method": "GET", "url": "{{baseUrl}}/projects?page=1&pageSize=10" }
+        },
+        {
+          "name": "Get Project by ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/projects/1" }
+        },
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/projects",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Project Beta\",\n  \"description\": \"Second project in TaskForge\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/projects/1",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Project Alpha (Updated)\",\n  \"description\": \"Updated description\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Project (Admin)",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/projects/2" }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Get All Tasks",
+          "request": { "method": "GET", "url": "{{baseUrl}}/tasks?page=1&pageSize=10" }
+        },
+        {
+          "name": "Get Tasks by Project",
+          "request": { "method": "GET", "url": "{{baseUrl}}/tasks?projectId=1&page=1&pageSize=10" }
+        },
+        {
+          "name": "Get Tasks by Status",
+          "request": { "method": "GET", "url": "{{baseUrl}}/tasks?status=Pending&page=1&pageSize=10" }
+        },
+        {
+          "name": "Get Task by ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/tasks/1" }
+        },
+        {
+          "name": "Get Tasks by User",
+          "request": { "method": "GET", "url": "{{baseUrl}}/tasks/user/2" }
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/tasks",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implement caching layer\",\n  \"description\": \"Add IMemoryCache to frequently-read endpoints\",\n  \"priority\": \"High\",\n  \"dueDate\": \"2025-12-31T00:00:00Z\",\n  \"projectId\": 1,\n  \"assignedToId\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/tasks/1",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Completed\",\n  \"priority\": \"Critical\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Task (Admin)",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/tasks/6" }
+        },
+        {
+          "name": "Bulk Update Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/tasks/bulk-update-status",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskIds\": [4, 5, 6],\n  \"status\": \"InProgress\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Task Summary Report",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports/task-summary" }
+        },
+        {
+          "name": "Project Task Reports",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports/project-tasks" }
+        },
+        {
+          "name": "User Productivity (Admin)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports/user-productivity" }
+        }
+      ]
+    }
+  ]
+}
